@@ -1,98 +1,303 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# PulseIQ
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+### Turn product signals into intelligent insights.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+PulseIQ is an AI-powered product analytics platform that transforms raw event data into actionable insights, user behavior analysis, and intelligent recommendations.
 
-## Description
+Instead of manually creating SQL queries or dashboards, users can upload datasets and instantly understand:
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- What happened
+- Why it happened
+- What should happen next
 
-## Project setup
+---
 
-```bash
-$ pnpm install
+## Overview
+
+PulseIQ helps teams understand product health and user behavior through analytics and AI.
+
+Upload event data and automatically generate:
+
+- User activity metrics
+- Retention analysis
+- Funnel analysis
+- Cohort analysis
+- Revenue insights
+- Pattern detection
+- AI-powered recommendations
+
+---
+
+## Core Workflow
+
+```text
+Upload Dataset
+      ↓
+Schema Detection
+      ↓
+Validation
+      ↓
+Normalization
+      ↓
+Metrics Calculation
+      ↓
+Pattern Detection
+      ↓
+AI Insight Generation
+      ↓
+Dashboard & Reports
 ```
 
-## Compile and run the project
+---
 
-```bash
-# development
-$ pnpm run start
+## Features
 
-# watch mode
-$ pnpm run start:dev
+### MVP — Core Analytics Foundation
 
-# production mode
-$ pnpm run start:prod
+**Dataset Processing**
+
+- CSV upload
+- Automatic schema detection
+- Manual field mapping
+- Validation & normalization
+- Dataset history
+
+**Analytics**
+
+- DAU / WAU / MAU
+- New & returning users
+- D1 / D7 / D30 retention
+
+**Dashboard**
+
+- User growth charts
+- Retention charts
+- Metrics overview
+
+**AI Insights**
+
+- Key findings
+- Trend analysis
+- Recommended actions
+
+---
+
+### V1 — Advanced Analytics
+
+**Behavior Analysis**
+
+- Funnel analysis
+- Cohort analysis
+- User segmentation
+
+**Business Metrics**
+
+- Revenue analytics
+- Conversion metrics
+- ARPU
+
+**Reporting**
+
+- PDF export
+- CSV export
+- Scheduled reports
+
+---
+
+### V2 — AI Analyst
+
+**Natural Language Analytics**
+
+- Ask questions in plain language
+- AI-generated queries
+- Insight summaries
+
+**Intelligence Features**
+
+- Weekly summaries
+- Insight ranking
+- Anomaly detection
+
+---
+
+### V3 — Realtime Platform
+
+**Data Ingestion**
+
+- API support
+- SDK integration
+- Webhooks
+
+**Exploration**
+
+- Event explorer
+- Event timeline
+- Search & filtering
+
+**Collaboration**
+
+- Workspaces
+- Team members
+- Roles & permissions
+
+---
+
+### Future Vision — AI Data Intelligence Platform
+
+**Predictive Intelligence**
+
+- Root cause analysis
+- Churn prediction
+- LTV prediction
+- Revenue forecasting
+
+**Automation**
+
+- Smart alerts
+- AI-generated dashboards
+- Experiment analysis
+
+---
+
+## Required Dataset Fields
+
+Minimum fields required for analytics:
+
+| Field      | Required |
+| ---------- | -------- |
+| user_id    | Yes      |
+| timestamp  | Yes      |
+| event_name | Yes      |
+
+Optional fields:
+
+- channel
+- revenue
+- country
+- device
+- campaign
+- properties
+
+---
+
+## Architecture
+
+Architecture patterns:
+
+- Clean Architecture
+- Domain-Driven Design (DDD)
+- Hexagonal Architecture
+- CQRS
+- Domain Events
+- Modular Monolith → Microservices migration path
+
+---
+
+## Project Structure
+
+```text
+src/
+
+├── modules
+│   ├── dataset
+│   ├── analytics
+│   ├── insight
+│   ├── reports
+│   └── users
+│
+├── shared
+│   ├── kernel
+│   ├── common
+│   └── events
+│
+└── infrastructure
 ```
 
-## Run tests
+---
 
-```bash
-# unit tests
-$ pnpm run test
+## Event Workflow
 
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
+```text
+DatasetUploaded
+      ↓
+SchemaValidated
+      ↓
+DataNormalized
+      ↓
+MetricsCalculated
+      ↓
+InsightsGenerated
 ```
 
-## Deployment
+---
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+## Tech Stack
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### Frontend
 
-```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
-```
+- Next.js
+- TypeScript
+- Tailwind CSS
+- Recharts
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### Backend
 
-## Resources
+- NestJS
+- TypeScript
 
-Check out a few resources that may come in handy when working with NestJS:
+### Storage
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+- PostgreSQL
+- MinIO
 
-## Support
+### Queue
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+- Redis
+- BullMQ
 
-## Stay in touch
+### Infrastructure
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+- Docker
 
-## License
+### Future Scaling
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+- ClickHouse
+- Kubernetes
+
+### AI
+
+- LLM Integration
+
+---
+
+## Roadmap
+
+**Phase 1**
+
+- Upload datasets
+- Core metrics
+- Dashboard
+- AI insights
+
+**Phase 2**
+
+- Funnel analysis
+- Cohort analysis
+- Segmentation
+
+**Phase 3**
+
+- AI analyst
+- Natural language analytics
+
+**Phase 4**
+
+- Prediction engine
+- Root cause analysis
+- Full AI data platform
+
+---
+
+## Mission
+
+Transform raw data into meaningful decision
