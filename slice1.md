@@ -72,12 +72,12 @@ src/
 ├── shared/
 │   └── events/
 │       └── domain-event.interface.ts
-docker-compose.yml
+k8s/
+├── postgres.yaml
+└── minio.yaml
 ```
 
 ---
-
-### Step 1 — Install Dependencies
 
 ## Step-by-Step Implementation Guide
 
@@ -86,7 +86,7 @@ docker-compose.yml
 ### Progress Checklist
 
 - [x] Step 1 — Install Dependencies (install packages)
-- [ ] Step 2 — Docker Compose (start Postgres & MinIO)
+- [ ] Step 2 — Kubernetes Manifests (start Postgres & MinIO)
 - [ ] Step 3 — Environment Config (`.env`)
 - [ ] Step 4 — Shared Domain Event Interface
 - [ ] Step 5 — Domain Layer (create value object, status enum, aggregate, event)
@@ -145,47 +145,180 @@ pnpm add -D @types/multer @types/uuid
 
 ---
 
-### Step 2 — Docker Compose (Infrastructure)
+### Step 2 — Kubernetes Manifests (Infrastructure)
 
-**File: `docker-compose.yml`** (project root)
+> **Prerequisite:** a running cluster and configured `kubectl` context. The default `StorageClass` for that cluster must support dynamic provisioning for the PVCs below.
+
+Since you're on **Docker Desktop**, use its **built-in Kubernetes** — no extra tools to install. You've enabled it with the **`kind`** provisioner and **2 nodes**, which gives a more realistic multi-node cluster (vs. the older single-node `kubeadm` provisioner).
+
+1. Docker Desktop → **Kubernetes** view → **Create cluster** → type **`kind`**, node count **2** → **Create**.
+2. Point `kubectl` at it and confirm both nodes are ready:
+
+```bash
+kubectl config use-context docker-desktop
+kubectl get nodes
+```
+
+Its default `StorageClass` (`hostpath`, provisioned via `rancher.io/local-path` in `kind` mode) supports dynamic provisioning out of the box, so the PVCs below need no extra setup.
+
+> **Multi-node note:** `NodePort` only guarantees reachability on the node it happens to route through, and Docker Desktop's `kind` provisioner doesn't statically map node ports to `localhost` the way its single-node `kubeadm` mode does. Instead, `kind` mode ships Docker Desktop's built-in `cloud-provider-kind` controller, which gives `type: LoadBalancer` Services a real, host-reachable address automatically — so the manifests below use `LoadBalancer` instead of `NodePort`.
+
+**File: `k8s/postgres.yaml`** (project root)
 
 ```yaml
-version: '3.9'
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-secret
+type: Opaque
+stringData:
+  POSTGRES_USER: pulseiq
+  POSTGRES_PASSWORD: pulseiq
+  POSTGRES_DB: pulseiq
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16-alpine
+          envFrom:
+            - secretRef:
+                name: postgres-secret
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: postgres-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+spec:
+  selector:
+    app: postgres
+  ports:
+    - port: 5432
+      targetPort: 5432
+  type: LoadBalancer
+```
 
-services:
-  postgres:
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_USER: pulseiq
-      POSTGRES_PASSWORD: pulseiq
-      POSTGRES_DB: pulseiq
-    ports:
-      - '5432:5432'
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+**File: `k8s/minio.yaml`** (project root)
 
-  minio:
-    image: minio/minio:latest
-    command: server /data --console-address ":9001"
-    environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
-    ports:
-      - '9000:9000'
-      - '9001:9001'
-    volumes:
-      - minio_data:/data
-
-volumes:
-  postgres_data:
-  minio_data:
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: minio-secret
+type: Opaque
+stringData:
+  MINIO_ROOT_USER: minioadmin
+  MINIO_ROOT_PASSWORD: minioadmin
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: minio-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minio
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      containers:
+        - name: minio
+          image: minio/minio:latest
+          args: ['server', '/data', '--console-address', ':9001']
+          envFrom:
+            - secretRef:
+                name: minio-secret
+          ports:
+            - containerPort: 9000
+            - containerPort: 9001
+          volumeMounts:
+            - name: minio-data
+              mountPath: /data
+      volumes:
+        - name: minio-data
+          persistentVolumeClaim:
+            claimName: minio-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio
+spec:
+  selector:
+    app: minio
+  ports:
+    - name: api
+      port: 9000
+      targetPort: 9000
+    - name: console
+      port: 9001
+      targetPort: 9001
+  type: LoadBalancer
 ```
 
 Start infra:
 
 ```bash
-docker compose up -d
+kubectl apply -f k8s/postgres.yaml
+kubectl apply -f k8s/minio.yaml
+kubectl get pods -w
 ```
+
+Check that both services picked up an external address from `cloud-provider-kind`:
+
+```bash
+kubectl get svc postgres minio
+```
+
+Once `EXTERNAL-IP` is populated (it typically resolves to `localhost`), Postgres and MinIO are reachable on `localhost:5432` / `localhost:9000` / `localhost:9001` — no `kubectl port-forward` needed, and Step 3's `.env` (which points at `localhost`) works unchanged.
+
+> If `EXTERNAL-IP` stays `<pending>` for more than a minute, or you switch to a cluster without `LoadBalancer` support, fall back to `kubectl port-forward svc/postgres 5432:5432` and `kubectl port-forward svc/minio 9000:9000 9001:9001` instead.
 
 ---
 
