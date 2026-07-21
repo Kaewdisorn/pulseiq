@@ -85,7 +85,7 @@ docker-compose.yml
 
 ### Progress Checklist
 
-- [ ] Step 1 — Install Dependencies (install packages)
+- [x] Step 1 — Install Dependencies (install packages)
 - [ ] Step 2 — Docker Compose (start Postgres & MinIO)
 - [ ] Step 3 — Environment Config (`.env`)
 - [ ] Step 4 — Shared Domain Event Interface
